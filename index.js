@@ -1,0 +1,36 @@
+import express from "express";
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import cors from "cors";
+import helmet from "helmet";
+import morgan from "morgan";
+
+dotenv.config({
+    path: `./config/config.env`
+});
+
+mongoose.connect(process.env.MONGODB_URI, {
+    useCreateIndex: true,
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+    useFindAndModify: false,
+    autoIndex: false
+}).then(response => {
+    console.log(`Connected to MongoDB on host ${response.connections[0].host}`);
+}).catch(error => {
+    if (!error) {
+        console.log(`Error: ${error.message}`);
+    }
+});
+
+const app = express();
+const PORT = process.env.PORT || 8000;
+
+app.use(cors());
+app.use(helmet());
+app.use(morgan('dev'));
+app.use(express.json());
+
+app.listen(PORT, () => {
+    console.log(`Connected to server in ${process.env.NODE_ENV} on port ${PORT}`);
+});
