@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user.js";
 
-exports.auth = async (req, res, next) => {
+export const auth = async (req, res, next) => {
     try {
         if(!req.headers){
             return res.status(400).json({message: `Invalid header format`});

@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import slugify from "slugify";
 
 const Schema = mongoose.Schema;
 
@@ -63,9 +64,17 @@ const challengeSchema = new Schema({
                 required: true
             }
         }]
+    },
+    slug: {
+        type: String
     }
 }, {timestamps: true, toJSON: {virtuals: true}, toObject: {virtuals: true}});
 
+challengeSchema.pre('save', async function (next) {
+    this.slug = slugify(this.title, {lower: true, replacement: '-'});
+    await this.save();
+    next();
+})
 
 const Challenge = mongoose.model('Challenge', challengeSchema);
 

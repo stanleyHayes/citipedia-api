@@ -1,7 +1,8 @@
-const mongoose = require('mongoose');
-const validator = require('validator');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+import mongoose from 'mongoose';
+import validator from 'validator';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
@@ -16,7 +17,7 @@ const userSchema = new Schema({
         trim: true,
         unique: true,
         validate: function (value) {
-            if(!validator.isEmail(value)){
+            if (!validator.isEmail(value)) {
                 throw new Error('Invalid email');
             }
         }
@@ -56,7 +57,7 @@ const userSchema = new Schema({
         trim: true,
         unique: true,
         validate: function (value) {
-            if(!validator.isMobilePhone(value)){
+            if (!validator.isMobilePhone(value)) {
                 throw new Error('Invalid phone');
             }
         }
@@ -68,18 +69,21 @@ const userSchema = new Schema({
     toObject: {virtuals: true}
 });
 
-userSchema.methods.comparePassword = async function (password)  {
+userSchema.methods.comparePassword = async function (password) {
     return await bcrypt.compare(password, this.password);
 }
 
-userSchema.pre('save',  async function(next){
-    this.password = await bcrypt.hash(this.password, 10);
-    await this.save();
+userSchema.pre('save', async function (next) {
+    if (this.isModified('password')) {
+        this.password = await bcrypt.hash(this.password, 10);
+    }
     next();
 });
 
 userSchema.methods.generateToken = async () => {
+    console.log(this);
     const token = jwt.sign({_id: this._id.toString()}, process.env.JWT_SECRET, {expiresIn: '30d'});
+    console.log(token);
     this.logins = this.logins.concat({token});
     await this.save();
     return token;
@@ -87,4 +91,4 @@ userSchema.methods.generateToken = async () => {
 
 const User = mongoose.model('User', userSchema);
 
-module.exports = User;
+export default User;

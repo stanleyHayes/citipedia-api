@@ -1,9 +1,9 @@
 import express from "express";
-import auth from "../middleware/auth.js";
+import {auth} from "../middleware/auth.js";
 
 const router = express.Router({mergeParams: true});
 
-const {
+import {
     register,
     login,
     getLoggedInAccount,
@@ -12,7 +12,7 @@ const {
     resetPassword,
     verifyAccount,
     forgotPassword
-} = require('../controllers/authentication');
+} from '../controllers/authentication.js';
 
 router.post('/register', register);
 router.post('/login', login);
@@ -22,3 +22,6 @@ router.delete('/me', auth, deleteAccount);
 router.put('/:token/verify-password', verifyAccount);
 router.post('/:token/reset-password', resetPassword);
 router.post('/forgot-password', forgotPassword);
+
+
+export default router;
